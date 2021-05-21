@@ -2,17 +2,19 @@ import firebase from 'firebase';
 
 if (!firebase.apps.length) {
   const firebaseConfig = {
-    apiKey: "AIzaSyAbR45lrzaZ33BtikqNBjtvnrHeWQaxiuk",
-    authDomain: "fir-sample-6629a.firebaseapp.com",
-    projectId: "fir-sample-6629a",
-    storageBucket: "fir-sample-6629a.appspot.com",
-    messagingSenderId: "639402109892",
-    appId: "1:639402109892:web:6209c24a6c6eaaa3f01291"
+    apiKey: "AIzaSyBDtleASuZY5kSj0DymEerkklbqaAyO1Mc",
+    authDomain: "fir-e24d3.firebaseapp.com",
+    projectId: "fir-e24d3",
+    storageBucket: "fir-e24d3.appspot.com",
+    messagingSenderId: "966028058737",
+    appId: "1:966028058737:web:9a2fa707219b675a293bd0"
   };
 
   firebase.initializeApp(firebaseConfig);
 }
 const db = firebase.firestore();
+export const auth = firebase.auth();
+export default firebase;
 export const getFirebaseItems = async () => {
   try {
     const snapshot = await db
@@ -53,3 +55,28 @@ export const clearFirebaseItem = async (item) => {
     console.log(err);
   });
 };
+
+export const uiConfig = {
+  signInFlow: 'popup',
+  signInSuccessUrl: "/",
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+  ],
+}
+
+export const storeUserInfo = async (user) => {
+  const { uid } = user;
+  const userDoc = await db.collection("users").doc(uid).get();
+  if (!userDoc.exists) {
+    await db.collection("users").doc(uid).set({ name: user.displayName });
+    return {
+      name: user.displayName,
+      id: uid,
+    };
+  } else {
+    return {
+      id: uid,
+      ...userDoc.data(),
+    };
+  }
+}
